@@ -17,7 +17,9 @@ lead to the implementation of other sessions, events, even years, we will not ha
 
 While AI was used throughout the majority of this project, I only have access to free copilot so was limited to models such as GPT-5 mini and Claude Haiku.
 This meant that the solutions produced to my prompts required some "massaging" to get right. I then hit my token limit before I could complete the project 
-so some of the code ended up being hand-written.
+so some of the code ended up being hand-written. Normally, had I used a model such as Claude Opus, I would largely expect this to have taken less intervention 
+although I admit I may also be taking other Claude skills we have for granted here.
+
 
 For the initial implementation of the API, I used this prompt:
 

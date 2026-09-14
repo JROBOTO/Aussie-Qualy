@@ -1,6 +1,6 @@
 JR.AussieQualy
 
-A clean, structured .NET 8 project for analysing Formula 1 qualifying laps from JSON data.The system loads lap‑by‑lap information, determines best laps per qualifying segment (Q1/Q2/Q3), evaluates sector performance, and exposes the results through a minimal API.
+A clean, structured .NET project for analysing Formula 1 qualifying laps from JSON data.The system loads lap‑by‑lap information, determines best laps per qualifying segment (Q1/Q2/Q3), evaluates sector performance, and exposes the results through a minimal API.
 
 The project is organised into three layers:
 
@@ -12,7 +12,9 @@ Application — Qualifying service, DTO mapping, sector status logic, and final 
 
 API — Minimal API exposing /qualifying/{driverCode}.
 
-Tests — Unit tests (service logic) and integration tests (API behaviour).
+Tests — Unit tests (service logic).
+
+Console App - Console application to act as client to api 
 
 🧱 Architecture Overview
 
@@ -107,14 +109,6 @@ JR.AussieQualy/
 
 ▶️ Running the API
 
-1. Ensure the lap data file exists
-
-Place your laps.json file here:
-
-JR.AussieQualy.Api/data/laps.json
-
-2. Run the API
-
 From the solution root:
 
 dotnet run --project JR.AussieQualy.Api
@@ -163,10 +157,6 @@ Example Response
 Unit Tests
 
 dotnet test JR.AussieQualy.Tests/Unit
-
-Integration Tests
-
-dotnet test JR.AussieQualy.Tests/Integration
 
 All tests use:
 

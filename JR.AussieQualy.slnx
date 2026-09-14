@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path="docs/README.md" />
+    <File Path="Technical Writeup.txt" />
   </Folder>
   <Project Path="src/JR.AussieQualy.Api/JR.AussieQualy.Api.csproj" />
   <Project Path="src/JR.AussieQualy.Application/JR.AussieQualy.Application.csproj" />

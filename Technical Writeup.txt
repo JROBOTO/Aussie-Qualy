@@ -1,0 +1,112 @@
+This submission contains two parts: the API and the console app. The api can be run independently with dotnet run and called through the .http file inside 
+the API. The console app serves as a sample client for the API. My intention was to break down how the data could be viewed such that it would be easier 
+to consume from a users perspective.
+
+I chose to implement sectors and minisectors as my additional feature as I believe a granular breakdown of the track is the most useful metric particularly 
+with this dataset as there was no adverse weather however I chose to return the weather conditions as they were cheap to implement and can be useful at other 
+events.
+
+I chose to load in all data at API launch time as this dataset is small enough for it not impact memory usage while being a gain in performance due to not 
+having to read the data on API calls. Larger datasets may call for the implementation of alternative strategies such as chunking or pagination.
+
+## Scalability
+The API route calls through the year, event, and session despite the task only being for the one qualifying session. This was because if future developments 
+lead to the implementation of other sessions, events, even years, we will not have to change the format of the route, just how the route is created.
+
+## AI Usage
+
+While AI was used throughout the majority of this project, I only have access to free copilot so was limited to models such as GPT-5 mini and Claude Haiku.
+This meant that the solutions produced to my prompts required some "massaging" to get right. I then hit my token limit before I could complete the project 
+so some of the code ended up being hand-written.
+
+For the initial implementation of the API, I used this prompt:
+
+====================================================================
+
+This file (session_laptimes.json) is a set of qualifying session data from the 2026 Australian Grand Prix. This page in github tells us how to read it. https://github.com/TracingInsights/2026/blob/main/DATA_REFERENCE.md#%EF%B8%8F-lap-times-data-laptimesjson
+It is indexed such that each row i in each section of the json is a single lap e.g. pos(i), time(i), and compound(i) are for the same lap.
+
+Using this, create an ASP.NET API which can be used to fetch processed data for a requested driver. Using the namespace JR.AussieQualy there should be a two GET endpoints, the first of which takes the 3 letter driver code as part of the route which should be /2026/AUS/Q/{driver_code} and returns the necessary info. The three letter code should be case insensitive, if the driver code doesn't exist, a 400 should be returned. The second should be a simple GET for all driver codes at /2026/AUS/Q/drivers so the client can ensure they input the correct code.
+
+The data should be read in once on api launch and accessed via the repository pattern in an infrastructure dedicated project. The business logic should happen in the application layer and the API should follow the minimal API pattern in an API layer
+
+The returned data should include the drivers best valid lap (not deleted) from each of the three qualifying segments and final classified position. The "pos" set however only gives the position at the end of that lap so we will need to process the final classification for each segment based on all drivers best times in that segment. FInal qualifying position will be based on the fact that the top 16 of Q1 go through to Q2, the bottom 6 will finish the session in the position they finished Q1. The top 10 of Q2 go through to Q3 with positions 11 through 16 finishing the session in the position they finished Q2 in. The top 10 go through to Q3 and will finish the session in whatever position they finish in Q3. For each sessions best lap we should return the following json structure:
+{
+	driver{
+		name,
+		driverNumber,
+		team
+	},
+	finalQualifyingPosition
+	q1{
+		lapData
+	},
+	q2{
+		lapData
+	},
+	q3{
+		lapData
+	}
+}
+where lapData follows this structure:
+{
+	lapTime,
+	lapStartTime,
+	tire{
+		compound,
+		life
+	},
+	conditions{
+		airTemperature,
+		humidity,
+		pressure,
+		rainfall,
+		trackTemperature,
+		windDirectionBearing,
+		windSpeedInMs
+	segmentPosition
+	sector1{
+		sectorTime,
+		miniSectors[
+			(set of strings e.g. yellow, green, purple)
+		],
+		sectorStatus (being "purple" for session best, "green" for personal best, or null if none based on the whole session)
+	},
+	sector2{
+		sectorTime,
+		miniSectors[
+			(set of strings e.g. yellow, green, purple)
+		],
+		sectorStatus
+	},
+	sector3{
+		sectorTime,
+		miniSectors[
+			(set of strings e.g. yellow, green, purple)
+		],
+		sectorStatus
+	},
+}
+
+The solution should follow all main software engineering practices e.g. SOLID, KISS, DRY as well as common C# practices. We should include unit tests for the business logic such as to confirm that we get the correct segment positions. Include a readme.md file explaining the breakdown of the solution and some of the base logic.
+
+==========================================================
+
+Then for the console application, I used this prompt:
+
+==========================================================
+
+Create a new project which should run as a console application which initialises by calling the drivers endpoint to get all driver details, then lists each driver such that the driver code = driver name grouped by team with a line break between each team grouping, telling the user to input one of the driver codes to view that drivers qualifying performance. If we input a driver code that was not in the returned list, we should present the user with an error and asking them to try again (this is case insensitive and should be trimmed of whitespace). When a valid driver has been entered, we should show their top level qualifying stats, q1 position and time, q2 position and time, q3 position and time, and final classification. We should then present options 1, 2, 3, or 4 for q1, q2, and q3 or back which should then give sector times, and again ask 1, 2, 3 for sectors 1, 2, and 3. Also we should present 4 for tyre info and 5 for conditions, 6 to go back. From the main list, we should also accept exit or the escape key to exit the application.
+
+==========================================================
+
+## Testing
+
+I implemented unit tests to test the core logic inside the QualifyingService.cs file. Unfortunately I ran out of time to implement integration tests however the core idea would have been to make the 
+test class inherit from WebApplicationBuilder<Program> and override the services to use the fake repository. I could then have called the API as though it were live from within the tests so could have 
+tested for valid 200 responses (with verified response bodies), 404s for nonexistent drivers, and 400s for bad requests.
+
+## Future
+
+If I were to develop this application further, I would implement a relation database in which to store the timing data. I would also build a front end using React which could compare 2 or more drivers performances 
+around a lap e.g. by comparing sector times and speed trap info

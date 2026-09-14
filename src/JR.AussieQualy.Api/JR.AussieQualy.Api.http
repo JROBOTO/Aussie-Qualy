@@ -1,9 +1,9 @@
 @JR.AussieQualy.Api_HostAddress = http://localhost:5144
 
-GET {{JR.AussieQualy.Api_HostAddress}}/2026/AUS/Q/drivers
+GET {{JR.AussieQualy.Api_HostAddress}}/2026/AUS/drivers
 Accept: application/json
 
 ###
 
-GET {{JR.AussieQualy.Api_HostAddress}}/2026/aus/q/ham
+GET {{JR.AussieQualy.Api_HostAddress}}/2026/aus/q/ALB
 Accept: application/json

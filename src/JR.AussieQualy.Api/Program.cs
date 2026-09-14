@@ -52,18 +52,11 @@ public static class Program
         });
 
         // GET all driver details for the 2026 AUS qualifying session
-        app.MapGet("/2026/AUS/Q", (IQualifyingService service) =>
+        app.MapGet("/2026/AUS/drivers", (IQualifyingService service) =>
         {
             try
             {
-                var codes = service.GetAllDriverCodes();
-
-                var results = codes
-                    .Select(code => service.GetDriverQualifyingResult(code))
-                    .Where(r => r is not null)
-                    .ToArray()!;
-
-                return Results.Ok(results);
+                return Results.Ok(service.GetAllDrivers());
             }
             catch (Exception ex)
             {

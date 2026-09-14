@@ -22,6 +22,17 @@ public sealed class QualifyingService : IQualifyingService
     public IReadOnlyCollection<string> GetAllDriverCodes() =>
         _allDrivers.Select(d => d.Code).OrderBy(c => c).ToArray();
 
+    public IReadOnlyCollection<DriverDto> GetAllDrivers() =>
+        _allDrivers
+            .Select(d => new DriverDto
+            {
+                Name = d.Name,
+                DriverNumber = d.Number,
+                Team = d.Team
+            })
+            .OrderBy(d => d.DriverNumber)
+            .ToArray();
+
     public DriverQualifyingResultDto? GetDriverQualifyingResult(string driverCode)
     {
         var driver = _allDrivers.FirstOrDefault(d =>

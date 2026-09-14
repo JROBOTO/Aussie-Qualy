@@ -7,8 +7,8 @@ public static class LapTimesJsonLoader
 {
     private static readonly JsonSerializerOptions Options = new()
     {
-        PropertyNameCaseInsensitive = true
-        ,Converters =
+        PropertyNameCaseInsensitive = true,
+        Converters =
         {
             new NullableDoubleJsonConverter(),
             new NullableIntJsonConverter()

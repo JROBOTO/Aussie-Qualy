@@ -4,8 +4,8 @@
   </Folder>
   <Project Path="src/JR.AussieQualy.Api/JR.AussieQualy.Api.csproj" />
   <Project Path="src/JR.AussieQualy.Application/JR.AussieQualy.Application.csproj" />
+  <Project Path="src/JR.AussieQualy.ConsoleApp/JR.AussieQualy.ConsoleApp.csproj" />
   <Project Path="src/JR.AussieQualy.Domain/JR.AussieQualy.Domain.csproj" />
   <Project Path="src/JR.AussieQualy.Infrastructure/JR.AussieQualy.Infrastructure.csproj" />
-  <Project Path="test/JR.AussieQualy.Tests.Integration/JR.AussieQualy.Tests.Integration.csproj" />
   <Project Path="test/JR.AussieQualy.Tests.Unit/JR.AussieQualy.Tests.Unit.csproj" />
 </Solution>

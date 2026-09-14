@@ -26,6 +26,7 @@ public sealed class QualifyingService : IQualifyingService
         _allDrivers
             .Select(d => new DriverDto
             {
+                Code = d.Code,
                 Name = d.Name,
                 DriverNumber = d.Number,
                 Team = d.Team
@@ -35,6 +36,11 @@ public sealed class QualifyingService : IQualifyingService
 
     public DriverQualifyingResultDto? GetDriverQualifyingResult(string driverCode)
     {
+        if (string.IsNullOrWhiteSpace(driverCode))
+        {
+            throw new ArgumentException(nameof(driverCode));
+        }
+
         var driver = _allDrivers.FirstOrDefault(d =>
             string.Equals(d.Code, driverCode, StringComparison.OrdinalIgnoreCase));
 
@@ -45,9 +51,9 @@ public sealed class QualifyingService : IQualifyingService
 
         var driverLaps = _allLaps.Where(l => l.Driver == driver).ToArray();
 
-        var q1Best = GetBestLapForSegment(driverLaps, QualifyingSegment.Q1);
-        var q2Best = GetBestLapForSegment(driverLaps, QualifyingSegment.Q2);
-        var q3Best = GetBestLapForSegment(driverLaps, QualifyingSegment.Q3);
+        var q1Best = GetBestLapForSegment(driver, driverLaps, QualifyingSegment.Q1);
+        var q2Best = GetBestLapForSegment(driver, driverLaps, QualifyingSegment.Q2);
+        var q3Best = GetBestLapForSegment(driver, driverLaps, QualifyingSegment.Q3);
 
         var finalPosition = ComputeFinalQualifyingPosition(driver);
 
@@ -55,6 +61,7 @@ public sealed class QualifyingService : IQualifyingService
         {
             Driver = new DriverDto
             {
+                Code = driver.Code,
                 Name = driver.Name,
                 DriverNumber = driver.Number,
                 Team = driver.Team
@@ -66,7 +73,22 @@ public sealed class QualifyingService : IQualifyingService
         };
     }
 
-    private LapDataDto? GetBestLapForSegment(IEnumerable<Lap> driverLaps, QualifyingSegment segment)
+    private int? GetSegmentPosition(Driver driver, QualifyingSegment qualifyingSegment)
+    {
+        var segmentClassification = _allLaps.Where(lap => lap.Segment == qualifyingSegment)
+                                           .GroupBy(lap => lap.Driver)
+                                           .Select(driverLaps => ( Driver: driverLaps.Key, BestLap: driverLaps.Min(lapTimes => lapTimes.LapTime)))
+                                           .OrderBy(bestLap => bestLap.BestLap)
+                                           .ToArray();
+
+        var driverSegmentBestLap = segmentClassification.SingleOrDefault(bestLaps => bestLaps.Driver == driver);
+
+        return driverSegmentBestLap == default
+            ? null
+            : segmentClassification.IndexOf(driverSegmentBestLap) + 1;
+    }
+
+    private LapDataDto? GetBestLapForSegment(Driver driver, IEnumerable<Lap> driverLaps, QualifyingSegment segment)
     {
         var lapsInSegment = driverLaps
             .Where(l => l.Segment == segment && l.LapTime.HasValue)
@@ -117,7 +139,7 @@ public sealed class QualifyingService : IQualifyingService
                 WindDirectionBearing = bestLap.Conditions.WindDirectionBearing,
                 WindSpeedInMs = bestLap.Conditions.WindSpeedInMs
             },
-            SegmentPosition = bestLap.SegmentPositionAtLapEnd,
+            SegmentPosition = GetSegmentPosition(driver, segment),
                 Sector1 = new SectorDto
             {
                 SectorTime = bestLap.SectorTimes.S1,
@@ -167,6 +189,7 @@ public sealed class QualifyingService : IQualifyingService
             {
                 Driver = d,
                 BestLap = GetBestLapForSegment(
+                    driver,
                     _allLaps.Where(l => l.Driver == d),
                     QualifyingSegment.Q1)
             })
@@ -184,6 +207,7 @@ public sealed class QualifyingService : IQualifyingService
             {
                 x.Driver,
                 BestLap = GetBestLapForSegment(
+                    driver,
                     _allLaps.Where(l => l.Driver == x.Driver),
                     QualifyingSegment.Q2)
             })
@@ -200,6 +224,7 @@ public sealed class QualifyingService : IQualifyingService
             {
                 x.Driver,
                 BestLap = GetBestLapForSegment(
+                    driver,
                     _allLaps.Where(l => l.Driver == x.Driver),
                     QualifyingSegment.Q3)
             })

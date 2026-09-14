@@ -1,10 +1,9 @@
 namespace JR.AussieQualy.Api;
 
-using JR.AussieQualy.Application.Dtos;
 using JR.AussieQualy.Application.Qualifying;
 using JR.AussieQualy.Infrastructure.LapTimes;
 
-public static class Program
+public sealed class Program
 {
     public static void Main(string[] args)
     {
@@ -13,7 +12,7 @@ public static class Program
         // Register services
         builder.Services.AddSingleton<ILapTimesRepository>(sp =>
         {
-            string jsonPath = Path.Combine(AppContext.BaseDirectory, "data", "session_laptimes.json");
+            var jsonPath = Path.Combine(AppContext.BaseDirectory, "data", "session_laptimes.json");
 
             if (!File.Exists(jsonPath))
             {
@@ -25,7 +24,7 @@ public static class Program
 
         builder.Services.AddScoped<IQualifyingService, QualifyingService>();
 
-        WebApplication app = builder.Build();
+        var app = builder.Build();
 
         app.MapGet("/2026/AUS/Q/{driverCode}", (string driverCode, IQualifyingService service) =>
         {

@@ -113,13 +113,13 @@ From the solution root:
 
 dotnet run --project JR.AussieQualy.Api
 
-The API will start on the default Kestrel port (usually http://localhost:5000).
+The API will start on the default Kestrel port (usually http://localhost:5144).
 
 🌐 Example API Request
 
 Request
 
-GET http://localhost:5000/qualifying/HAM
+GET http://localhost:5144/2026/AUS/Q/HAM
 
 Example Response
 
